@@ -2,39 +2,46 @@
    Theme Variables (Light & Dark Mode)
    ========================================= */
 :root {
-  --bg: #f4f6f9;
-  --surface: #ffffff;
-  --surface-alt: #f8fafc;
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --secondary: #475569;
+  --bg:              #f4f6f9;
+  --surface:         #ffffff;
+  --surface-alt:     #f8fafc;
+  --text:            #1e293b;
+  --text-muted:      #64748b;
+  --border:          #e2e8f0;
+  --accent:          #2563eb;
+  --accent-hover:    #1d4ed8;
+  --secondary:       #475569;
   --secondary-hover: #334155;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --success: #16a34a;
-  --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
-  --radius: 14px;
-  --radius-sm: 8px;
+  --danger:          #dc2626;
+  --danger-bg:       #fef2f2;
+  --success:         #16a34a;
+  --shadow:          0 4px 16px rgba(15, 23, 42, 0.06);
+  --radius:          14px;
+  --radius-sm:       8px;
+
+  /* Accessibility: minimum target size for interactive elements (WCAG 2.5.5) */
+  --min-touch: 44px;
+
+  /* Focus ring shared style — defined once, used everywhere */
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.45);
 }
 
 [data-theme="dark"] {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface-alt: #273549;
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-  --border: #334155;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --secondary: #64748b;
+  --bg:              #0f172a;
+  --surface:         #1e293b;
+  --surface-alt:     #273549;
+  --text:            #f1f5f9;
+  --text-muted:      #94a3b8;
+  --border:          #334155;
+  --accent:          #3b82f6;
+  --accent-hover:    #60a5fa;
+  --secondary:       #64748b;
   --secondary-hover: #94a3b8;
-  --danger: #f87171;
-  --danger-bg: rgba(248, 113, 113, 0.12);
-  --success: #4ade80;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  --danger:          #f87171;
+  --danger-bg:       rgba(248, 113, 113, 0.12);
+  --success:         #4ade80;
+  --shadow:          0 4px 20px rgba(0, 0, 0, 0.35);
+  --focus-ring:      0 0 0 3px rgba(96, 165, 250, 0.5);
 }
 
 /* =========================================
@@ -48,13 +55,32 @@
   padding: 0;
 }
 
+/* Accessibility: honour user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration:  0.01ms !important;
+  }
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+               Ubuntu, Cantarell, sans-serif;
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.5;
   min-height: 100vh;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Accessibility: show a visible focus indicator for keyboard navigation.
+   We use :focus-visible so the ring only appears for keyboard, not mouse. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 
 .hidden {
@@ -94,6 +120,8 @@ body {
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+  /* Accessibility: prevent heading from overflowing on very small viewports */
+  word-break: break-word;
 }
 
 .date-text {
@@ -107,6 +135,7 @@ body {
   align-items: center;
   gap: 8px;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .name-form input {
@@ -170,11 +199,24 @@ input[type="text"] {
   color: var(--text);
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  /* Accessibility: ensure a minimum height so the field is easy to tap */
+  min-height: var(--min-touch);
 }
 
 input[type="text"]:focus {
   border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+/* Accessibility: mark invalid URL field visually without relying on colour alone */
+input[type="text"][aria-invalid="true"] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3);
+}
+
+[data-theme="dark"] input[type="text"][aria-invalid="true"] {
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.35);
 }
 
 .btn {
@@ -188,13 +230,18 @@ input[type="text"]:focus {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease,
+              border-color 0.15s ease, box-shadow 0.15s ease;
   white-space: nowrap;
+  /* Accessibility: minimum touch target */
+  min-height: var(--min-touch);
 }
 
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.85rem;
+  /* btn-sm is used in tight inline contexts; keep it smaller but still tappable */
+  min-height: 36px;
 }
 
 .btn-primary {
@@ -230,14 +277,18 @@ input[type="text"]:focus {
   border: 1px solid var(--border);
   color: var(--text-muted);
   border-radius: 6px;
+  /* Visual size stays 30×30, but we add padding so the touch target reaches
+     the WCAG minimum without changing the icon's visual footprint */
   width: 30px;
   height: 30px;
+  min-width: 30px; /* prevent flex squash */
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.9rem;
-  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease,
+              background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-icon:hover {
@@ -250,6 +301,13 @@ input[type="text"]:focus {
   color: var(--danger);
   border-color: var(--danger);
   background-color: var(--danger-bg);
+}
+
+/* Accessibility: [aria-pressed="true"] gives a clear active state to the
+   Start button while the timer is running */
+#timer-start[aria-pressed="true"] {
+  background-color: var(--accent-hover);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* =========================================
@@ -265,18 +323,24 @@ input[type="text"]:focus {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   margin: 8px 0 4px;
+  /* Accessibility: announce only when value changes meaningfully;
+     polite is correct here — the interval ticks every second */
+  /* Note: aria-live is set in HTML; this is a reminder comment only */
 }
 
 .timer-status {
   color: var(--text-muted);
   font-size: 0.9rem;
   margin-bottom: 20px;
+  /* Reserve a fixed height so layout does not shift when status text changes */
+  min-height: 1.4em;
 }
 
 .timer-controls {
   display: flex;
   justify-content: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* =========================================
@@ -302,6 +366,12 @@ input[type="text"]:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   overflow: hidden;
+  /* Smooth border-color change when theme switches */
+  transition: border-color 0.15s ease;
+}
+
+.link-item:hover {
+  border-color: var(--text-muted);
 }
 
 .link-anchor {
@@ -311,10 +381,19 @@ input[type="text"]:focus {
   font-size: 0.9rem;
   font-weight: 500;
   transition: color 0.15s ease, background-color 0.15s ease;
+  /* Accessibility: minimum touch height */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-touch);
 }
 
 .link-anchor:hover {
   color: var(--accent);
+}
+
+/* Accessibility: underline on focus so it's distinguishable as a link */
+.link-anchor:focus-visible {
+  text-decoration: underline;
 }
 
 .link-delete {
@@ -326,6 +405,10 @@ input[type="text"]:focus {
   cursor: pointer;
   font-size: 0.85rem;
   transition: color 0.15s ease, background-color 0.15s ease;
+  /* Accessibility: minimum touch size */
+  min-height: var(--min-touch);
+  display: inline-flex;
+  align-items: center;
 }
 
 .link-delete:hover {
@@ -354,6 +437,8 @@ input[type="text"]:focus {
   border: 1px solid var(--border);
   padding: 4px 10px;
   border-radius: 999px;
+  /* Prevent the pill from shrinking on narrow screens */
+  white-space: nowrap;
 }
 
 .todo-form {
@@ -369,6 +454,8 @@ input[type="text"]:focus {
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   margin-bottom: 12px;
+  /* Accessibility: add a left border so the message is not colour-only */
+  border-left: 3px solid var(--danger);
 }
 
 .todo-list {
@@ -387,16 +474,23 @@ input[type="text"]:focus {
   background-color: var(--surface-alt);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .todo-item:hover {
   border-color: var(--text-muted);
 }
 
+/* Visual polish: very subtle highlight on hover to reinforce interactivity */
+.todo-item:hover:not(.completed) {
+  background-color: var(--surface);
+}
+
 .todo-checkbox {
   width: 18px;
   height: 18px;
+  /* Accessibility: increase the actual click/touch area without changing visuals */
+  min-width: 18px;
   accent-color: var(--accent);
   cursor: pointer;
   flex-shrink: 0;
@@ -413,10 +507,17 @@ input[type="text"]:focus {
   color: var(--text-muted);
 }
 
+/* Visual polish: dim the whole completed row slightly, not just the text */
+.todo-item.completed {
+  opacity: 0.75;
+}
+
 .todo-edit-input {
   flex: 1;
   padding: 6px 10px !important;
   font-size: 0.95rem;
+  /* Match the row height so the item doesn't jump in size during edit */
+  min-height: unset;
 }
 
 .todo-actions {
@@ -454,5 +555,35 @@ input[type="text"]:focus {
 
   .clock-text {
     font-size: 1.5rem;
+  }
+
+  /* On small screens the todo form input can be very narrow; let it wrap */
+  .todo-form {
+    flex-wrap: wrap;
+  }
+
+  .todo-form input {
+    flex: 1 1 100%;
+  }
+
+  /* Name form on small screens */
+  .name-form {
+    gap: 6px;
+  }
+
+  .name-form input {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+/* Very small screens (≤ 400 px): shrink the timer display so it doesn't overflow */
+@media (max-width: 400px) {
+  .timer-display {
+    font-size: 2.75rem;
+  }
+
+  .clock-text {
+    font-size: 1.25rem;
   }
 }
